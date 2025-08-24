@@ -1,0 +1,7 @@
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../config/firebase";
+
+export const signInEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
+export const signUpEmail = (email, password) => createUserWithEmailAndPassword(auth, email, password);
+export const logout = () => signOut(auth);
+export const subscribeAuth = (cb) => onAuthStateChanged(auth, cb);

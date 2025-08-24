@@ -1,208 +1,93 @@
+import AuthLayout from "../components/widgets/AuthLayout";
+import Field from "../components/ui/Field";
+import Checkbox from "../components/ui/Checkbox";
+import useFormState from "../hooks/useFormState";
+import { validateSignup } from "../utils/validators";
+import { mapAuthError } from "../utils/firebaseErrors";
+import { signUpEmail } from "../services/authService";
 import { useState } from "react";
-import AuthLayout from "../layout/AuthLayout";
-import "../css/auth.css";
-import { auth } from '../config/firebase';
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
-    const [values, setValues] = useState({
-        name: "",
-        email: "",
-        password: "",
-        agree: false,
-    });
+  const { values, touched, errors, handleChange, handleBlur, validateAll, setTouched } =
+    useFormState({ name: "", email: "", password: "", agree: false }, validateSignup);
 
-    const [errors, setErrors] = useState({});
-    const [touched, setTouched] = useState({});
-    const [submitting, setSubmitting] = useState(false);
-    const [formError, setFormError] = useState(""); // خطأ عام (إن احتجته لاحقًا)
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setFormError("");
 
-    const validate = (vals) => {
-        const e = {};
+    const { hasErrors } = validateAll();
+    setTouched({ name: true, email: true, password: true, agree: true });
+    if (hasErrors) { setSubmitting(false); return; }
 
-        // Name
-        if (!vals.name.trim()) {
-            e.name = "Name is required.";
-        } else if (vals.name.trim().length < 2) {
-            e.name = "Name must be at least 2 characters.";
-        }
-
-        // Email
-        if (!vals.email.trim()) {
-            e.email = "Email is required.";
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(vals.email.trim())) {
-            e.email = "Please enter a valid email address.";
-        }
-
-        // Password
-        if (!vals.password) {
-            e.password = "Password is required.";
-        } else if (vals.password.length < 6) {
-            e.password = "Password must be at least 6 characters.";
-        }
-
-        // Terms
-        if (!vals.agree) {
-            e.agree = "You must agree to the terms & policy.";
-        }
-
-        return e;
-    };
-
-    const handleChange = (e) => {
-        const { name, type, checked, value } = e.target;
-        const v = type === "checkbox" ? checked : value;
-        setValues((prev) => ({ ...prev, [name]: v }));
-
-        const fieldErrors = validate({ ...values, [name]: v });
-        setErrors((prev) => ({ ...prev, [name]: fieldErrors[name] }));
-    };
-
-    const handleBlur = (e) => {
-        const { name } = e.target;
-        setTouched((prev) => ({ ...prev, [name]: true }));
-        const fieldErrors = validate(values);
-        setErrors((prev) => ({ ...prev, [name]: fieldErrors[name] }));
-    };
-
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        setSubmitting(true);
-        setFormError("");
-
-        const v = validate(values);
-        setErrors(v);
-        setTouched({
-            name: true,
-            email: true,
-            password: true,
-            agree: true,
-        });
-
-        if (Object.keys(v).length) {
-            setSubmitting(false);
-            return;
-        }
-
-
-        try {
-            const email = values.email.trim();
-            const password = values.password;
-            await createUserWithEmailAndPassword(auth, email, password);
-
-            navigate('/login');
-
-        } catch (err) {
-            const msg = mapAuthError(err);
-            setFormError(msg);
-        } finally {
-            setSubmitting(false);
-        }
-
-    };
-    const mapAuthError = (err) => {
-        const code = err?.code || "";
-        if (code.includes("auth/invalid-credential")) return "Email or password is incorrect.";
-        if (code.includes("auth/email-already-in-use")) return "This Email is Already in use";
-        if (code.includes("auth/wrong-password")) return "Incorrect password.";
-        if (code.includes("auth/invalid-email")) return "Invalid email address.";
-        if (code.includes("auth/too-many-requests")) return "Too many attempts. Please try again later.";
-        return err?.message || "Login failed. Please try again.";
+    try {
+      await signUpEmail(values.email.trim(), values.password);
+      navigate("/login");
+    } catch (err) {
+      setFormError(mapAuthError(err));
+    } finally {
+      setSubmitting(false);
     }
-    return (
-        <AuthLayout
-            swap={
-                <>
-                    Have an account?{" "}
-                    <a href="/login" className="link"> Sign In</a>
-                </>
-            }>
-            <h1 className="auth-title">Get Started Now</h1>
+  };
 
-            <form className="auth-form" onSubmit={onSubmit} noValidate>
-                {/* Name */}
-                <label className="field">
-                    <span className="field-label">Name</span>
-                    <input
-                        placeholder="Enter your name"
-                        name="name"
-                        type="text"
-                        className={`field-input ${touched.name && errors.name ? "is-invalid" : ""}`}
-                        value={values.name}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        required
-                    />
-                    {touched.name && errors.name && (
-                        <div className="field-error">{errors.name}</div>
-                    )}
-                </label>
+  return (
+    <AuthLayout swap={<>Have an account? <a href="/login" className="link">Sign In</a></>}>
+      <h1 className="auth-title">Get Started Now</h1>
 
-                {/* Email */}
-                <label className="field">
-                    <span className="field-label">Email address</span>
-                    <input
-                        placeholder="Enter your email"
-                        name="email"
-                        type="email"
-                        className={`field-input ${touched.email && errors.email ? "is-invalid" : ""}`}
-                        value={values.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        required
-                    />
-                    {touched.email && errors.email && (
-                        <div className="field-error">{errors.email}</div>
-                    )}
-                </label>
+      <form className="auth-form" onSubmit={onSubmit} noValidate>
+        <Field
+          label="Name"
+          name="name"
+          value={values.name}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Enter your name"
+          touched={touched.name}
+          error={errors.name}
+        />
 
-                {/* Password */}
-                <label className="field">
-                    <span className="field-label">Password</span>
-                    <input
-                        placeholder="Enter a password"
-                        name="password"
-                        type="password"
-                        className={`field-input ${touched.password && errors.password ? "is-invalid" : ""}`}
-                        value={values.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        required
-                        minLength={6}
-                    />
-                    {touched.password && errors.password && (
-                        <div className="field-error">{errors.password}</div>
-                    )}
-                </label>
+        <Field
+          label="Email address"
+          name="email"
+          type="email"
+          value={values.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Enter your email"
+          touched={touched.email}
+          error={errors.email}
+        />
 
+        <Field
+          label="Password"
+          name="password"
+          type="password"
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Enter a password"
+          touched={touched.password}
+          error={errors.password}
+        />
 
-                {/* Terms */}
-                <label className="check">
-                    <input
-                        type="checkbox"
-                        name="agree"
-                        checked={values.agree}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        required
-                    />{" "}
-                    <span>I agree to terms & policy</span>
-                </label>
-                {touched.agree && errors.agree && (
-                    <div className="field-error">{errors.agree}</div>
-                )}
+        <Checkbox name="agree" checked={values.agree} onChange={handleChange}>
+          I agree to terms & policy
+        </Checkbox>
+        {touched.agree && errors.agree && <div className="field-error">{errors.agree}</div>}
 
-                {formError && <div className="form-error">{formError}</div>}
+        {formError && <div className="form-error">{formError}</div>}
 
-                <button type="submit" className="btn-primary" disabled={submitting}>
-                    {submitting ? "Signing up..." : "Signup"}
-                </button>
-            </form>
+        <button type="submit" className="btn-primary" disabled={submitting}>
+          {submitting ? "Signing up..." : "Signup"}
+        </button>
 
-
-        </AuthLayout>
-    );
+  
+      </form>
+    </AuthLayout>
+  );
 }

@@ -20,6 +20,11 @@ body {
     color: #1f2937;
 }
 
+html,
+body {
+    scrollbar-width: none;
+}
+
 .auth {
     display: grid;
     min-height: 100%;
@@ -34,8 +39,6 @@ body {
 
 .auth-right {
     display: none;
-    background: url("../assets/authImage.jpg") center/cover no-repeat;
-    border-radius: 45px
 }
 
 .auth-title {
@@ -50,7 +53,7 @@ body {
 .auth-form {
     display: grid;
     gap: 25px;
-    margin-top: 60px;
+    padding-top: 40px;
 }
 
 .field {
@@ -160,7 +163,7 @@ body {
     color: #000000;
     font-size: 14px;
 
-    margin-block: 60px;
+    padding-block: 60px;
 }
 
 .divider::before,
@@ -214,15 +217,43 @@ body {
 }
 
 .auth-card {
-    padding-block: 150px;
+    padding-block: 100px;
 }
 
 @media (min-width:1024px) {
+    .auth-left {
+        max-width: 720px;
+        padding-block: 200px;
+        padding-inline: 75px;
+    }
+     
+
+
+    .auth-card {
+        padding-block: 0px;
+    }
+
+    .auth {
+        height: 100vh;
+    }
+
+}
+
+@media (min-width:768px) {
     .auth {
         grid-template-columns: 1fr 1fr;
+        height: 100%;
     }
 
     .auth-right {
         display: block;
+        background: url("../assets/authImage.jpg") center/cover no-repeat;
+        border-top-left-radius: 45px;
+        border-bottom-left-radius: 45px
+    }
+
+    .auth-form {
+        gap: 20px;
+        padding-top: 60px;
     }
 }
