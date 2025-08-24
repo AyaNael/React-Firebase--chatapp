@@ -1,6 +1,7 @@
 import "../../css/auth.css";
-import googleIcon from "../../assets/google.svg";
-import appleIcon from "../../assets/apple.svg";
+import Divider from "../ui/Divider";
+import SocialAuthButtons from "../widgets/SocialAuthButtons";
+
 function AuthLayout({ children, swap }) {
     return (
         <main className="auth">
@@ -8,21 +9,8 @@ function AuthLayout({ children, swap }) {
                 <div className="auth-card">
                     {children}
 
-                    {/* Divider */}
-                    <div className="divider">Or</div>
-
-                    {/* Social login buttons */}
-                    <div className="social-login">
-                        <button type="button" className="btn-social google">
-                            <img src={googleIcon} alt="google icon"/>
-                            Sign in with Google
-                        </button>
-                        <button type="button" className="btn-social apple">
-                            <img src={appleIcon} alt="apple icon" />
-                            Sign in with Apple
-
-                        </button>
-                    </div>
+                    <Divider>Or</Divider>
+                    <SocialAuthButtons onGoogle={() => { }} onApple={() => { }} />
 
                     {/* Swap link (login/signup) */}
                     {swap && <div className="swap">{swap}</div>}

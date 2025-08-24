@@ -17,7 +17,6 @@ export default function Login() {
   const { values, touched, errors, handleChange, handleBlur, validateAll, setTouched } =
     useFormState({ email: "", password: "", remember: false }, validateLogin);
 
-  // منطق rememberMe عند بدء التطبيق
   useEffect(() => {
     const unsub = subscribeAuth(async (user) => {
       const remember = getRememberMe();
