@@ -1,0 +1,74 @@
+* {
+    font-family: 'SF Pro Text Regular', sans-serif;
+    font-weight: 100;
+}
+
+.chat-screen {
+    padding: 12px;
+}
+
+.chat-title {
+    margin: 0;
+    font-size: 23px;
+    font-family: 'SF Pro Text Bold', sans-serif;
+    font-weight: 700;
+}
+
+.chat-search {
+    padding: 12px 10PX;
+    width: 100%;
+    position: relative;
+}
+
+.chat-search .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #667085;
+    pointer-events: none;
+}
+
+.chat-search input {
+    width: 100%;
+    background-color: #EEEEEE;
+    padding-left: 36px;
+}
+
+.chat-empty {
+    padding: 16px;
+    color: #667085;
+    font-size: 14px;
+}
+
+.chat-sort {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chat-sort select {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: var(--brand);
+    cursor: pointer;
+}
+
+@font-face {
+    font-family: 'SF Pro Text Bold';
+    src: url('../assets/fonts/SFPRODISPLAYBOLD.OTF') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SF Pro Text Regular';
+    src: url('../assets/fonts/SFPRODISPLAYREGULAR.OTF') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}

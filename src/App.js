@@ -13,6 +13,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route index path="/signup" element={<Signup />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/chat/:id" element={<Chat />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

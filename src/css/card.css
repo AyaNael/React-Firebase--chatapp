@@ -1,0 +1,17 @@
+
+.card {
+    overflow: hidden;
+}
+
+
+.card-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.card-body--padded {
+    padding: 12px;
+}
