@@ -1,92 +1,180 @@
+html,
+body,
+#root {
+height: 100svh;  
+}
+
 .thread-wrap {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  height: 100vh;      /* تشبه موبايل */
-  background: #fff;
-}
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #fff;
+    min-height: 0;
+  flex: 1 1 auto;
 
-.thread-header {
-  display: grid;
-  grid-template-columns: 40px 40px 1fr auto;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid #eee;
-}
-
-.back-btn {
-  border: 0;
-  background: transparent;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.thread-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-}
-
-.thread-title .name {
-  font-weight: 700;
-}
-.thread-title .status {
-  color: #10b981;     /* أخضر Online */
-  font-size: 12px;
 }
 
 .thread-body {
-  padding: 12px;
-  overflow-y: auto;
-  background: #f8f8f8;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    background: #FAFAFA;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0;
+    overscroll-behavior: contain;
 }
 
-.msg-row {
-  max-width: 80%;
-  display: grid;
-  gap: 4px;
-  margin: 8px 0;
+.thread-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #fff;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
+    display: grid;
+    grid-template-columns: 40px 40px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    flex: 0 0 auto;
 }
 
-.msg-row.them { justify-items: start; }
-.msg-row.me   { justify-items: end; margin-left: auto; }
+.back-btn {
+    border: 0;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.thread-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.thread-title .name {
+    font-weight: 700;
+}
+
+.thread-title .status {
+    color: #10b981;
+    font-size: 12px;
+}
+
+.bubble-row {
+    max-width: 80%;
+    display: grid;
+    grid-template-columns: 28px auto;
+    align-items: center;
+    gap: 8px;
+    max-width: 78%;
+    margin: 8px 0;
+}
+
+.bubble-row.is-them {
+    align-self: flex-start;
+}
+
+.bubble-row.is-me {
+    align-self: flex-end;
+    text-align: right;
+    grid-template-columns: auto;
+}
+
+.bubble-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
 
 .bubble {
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: #eef2ff; /* من الطرف الآخر */
-}
-.msg-row.me .bubble {
-  background: #e6f7ef; /* فقاعاتي */
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: #F4F4F7;
+    line-height: 1.45;
+    word-break: break-word;
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
 }
 
-.time {
-  color: #9aa1ab;
-  font-size: 11px;
+.bubble-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #9aa1ab;
+    font-size: 11px;
 }
 
 .thread-input {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  padding: 10px;
-  border-top: 1px solid #eee;
-  background: #fff;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    padding: 10px;
+    border-top: 1px solid #eee;
+    background: #fff;
 }
 
-.thread-input input {
-  border: 0;
-  background: #f1f1f1;
-  border-radius: 18px;
-  padding: 12px 14px;
-  outline: none;
+.thread-textarea {
+    border: 0;
+    background: #f1f1f1;
+    border-radius: 18px;
+    padding: 10px 14px;
+    outline: none;
+    resize: none;
+    max-height: 160px;
+    /* متزامن مع أقصى تمدد في JS */
 }
 
 .send-btn {
-  border: 0;
-  padding: 0 16px;
-  border-radius: 18px;
-  background: #059669;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
+    border: 0;
+    padding: 0 16px;
+    border-radius: 18px;
+    background: #059669;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.send-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-btn {
+    border: 0;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    background: white;
+    color: #059669;
+}
+
+.icon-btn:hover {
+    background: #e9e9ea;
+    border-radius: 50%;
+}
+
+@media (min-width:768px) {
+    .thread-header {
+        grid-template-columns: 40px 1fr auto;
+        /* Avatar | Title | Actions */
+    }
+
+    .thread-header .back-btn {
+        display: none;
+    }
 }

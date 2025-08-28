@@ -1,6 +1,44 @@
+html,
+body,
+#root {
+    height: 100%;
+    height: 100svh;
+    overflow: hidden;
+    margin: 0;
+}
+
 * {
     font-family: 'SF Pro Text Regular', sans-serif;
     font-weight: 100;
+}
+
+/* الغلاف الأساسي: عمود واحد على الموبايل */
+.chat-desktop {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow: hidden;
+}
+
+.sidebar {
+    display: none !important;
+}
+
+.list-panel,
+.thread-panel {
+    min-width: 0;
+}
+
+.list-panel {
+    overflow: auto;
+}
+
+.thread-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .chat-screen {
@@ -59,6 +97,208 @@
     cursor: pointer;
 }
 
+.bottom-bar {
+    display: none;
+}
+
+.chat-desktop.no-thread .bottom-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    height: 64px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    align-items: center;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-right: 1px solid #eee;
+    padding: 12px 8px;
+    min-height: 0;
+}
+
+
+.sb-top {
+    display: grid;
+    place-items: center;
+    gap: 14px;
+    padding-top: 4px;
+}
+
+.sb-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 14px;
+    justify-items: center;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+}
+
+.sb-bottom {
+    margin-top: auto;
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    padding-bottom: 8px;
+    width: 100%;
+}
+
+
+.sb-brand {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: 0;
+    color: #22c55e;
+    cursor: default;
+}
+
+.sb-brand-icon {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+.sb-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.sb-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+
+.sb-divider {
+    width: 42px;
+    height: 1px;
+    border: 0;
+    background: #e5e7eb;
+    margin: 10px 0;
+}
+
+
+
+.sb-item {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sb-item:hover {
+    background: #eef5f0;
+}
+
+
+.sb-item.is-active {
+    background: #22c55e;
+    box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
+}
+
+.sb-item.is-active .sb-icon {
+    filter: brightness(0) invert(1);
+}
+
+.sb-icon {
+    width: 28px;
+    height: 28px;
+    display: block;
+    object-fit: contain;
+}
+
+.list-panel {
+    border-right: 1px solid #eee;
+    overflow: auto;
+    padding-block: 12px;
+}
+
+.thread-panel {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+}
+
+.sb-item.is-active .sb-icon,
+.sb-item.is-active .sb-icon * {
+    fill: #fff !important;
+    stroke: #fff !important;
+}
+
+.bb-item {
+    border: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    grid-auto-rows: min-content;
+    gap: 4px;
+    padding: 6px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+
+}
+
+.bb-item:hover {
+    background: #eef5f0;
+}
+
+
+.bb-item.is-active {
+    background: #22c55e;
+    box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
+}
+
+.bb-item.is-active .bb-icon {
+    filter: brightness(0) invert(1);
+}
+
+.bb-item.is-active .bb-icon,
+.bb-item.is-active .bb-icon * {
+    fill: #fff !important;
+    stroke: #fff !important;
+}
+
+/* أهم سطرين: قَيِّد حجم الأيقونة سواء كانت <img> أو <svg> */
+.bottom-bar img,
+.bottom-bar svg,
+.bb-icon {
+    width: 22px !important;
+    height: 22px !important;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
 @font-face {
     font-family: 'SF Pro Text Bold';
     src: url('../assets/fonts/SFPRODISPLAYBOLD.OTF') format('truetype');
@@ -71,4 +311,111 @@
     src: url('../assets/fonts/SFPRODISPLAYREGULAR.OTF') format('truetype');
     font-weight: 400;
     font-style: normal;
+}
+
+@media (max-width: 767px) {
+    .chat-desktop {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none !important;
+    }
+
+    /* قائمة فقط */
+    .chat-desktop.no-thread .list-panel {
+        display: block !important;
+    }
+
+    .chat-desktop.no-thread .thread-panel {
+        display: none !important;
+    }
+
+    /* ثريد فقط */
+    .chat-desktop.has-thread .list-panel {
+        display: none !important;
+    }
+
+    .chat-desktop.has-thread .thread-panel {
+        display: flex !important;
+    }
+
+  
+}
+
+/* ===== Tablet — 768–1023px ===== */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .chat-desktop {
+        grid-template-columns: 72px 320px 1fr;
+    }
+
+    /* Sidebar | List | Thread */
+
+    .sidebar {
+        display: flex !important;
+        flex-direction: column;
+        height: 100%;
+        border-right: 1px solid #eee;
+        padding: 12px 8px;
+    }
+
+    .list-panel {
+        display: block !important;
+        overflow: auto;
+        min-height: 0;
+    }
+
+    .list-panel {
+        display: block !important;
+    }
+
+    .thread-panel {
+        display: flex !important;
+    }
+
+    .bottom-bar {
+        display: none !important;
+    }
+
+
+
+    .list-panel,
+    .thread-panel,
+    .thread-wrap {
+        padding-bottom: 0 !important;
+    }
+}
+
+
+/* ========== Desktop (>=1024px) ========== */
+@media (min-width: 1024px) {
+    .chat-desktop {
+        grid-template-columns: 72px 340px 1fr;
+    }
+
+    .sidebar {
+        display: flex !important;
+        flex-direction: column;
+        height: 100%;
+        border-right: 1px solid #eee;
+        padding: 12px 8px;
+    }
+
+    .list-panel {
+        display: block !important;
+        overflow: auto;
+        min-height: 0;
+    }
+
+
+    .thread-panel {
+        display: flex !important;
+    }
+
+    .bottom-bar {
+        display: none !important;
+    }
+
+
+
 }

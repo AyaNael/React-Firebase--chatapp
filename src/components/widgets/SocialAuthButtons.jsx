@@ -1,6 +1,6 @@
 import SocialButton from "../ui/SocialButton";
-import googleIcon from "../../assets/google.svg";
-import appleIcon from "../../assets/apple.svg";
+import googleIcon from "../../assets/images/google.svg";
+import appleIcon from "../../assets/images/apple.svg";
 
 export default function SocialAuthButtons({ onGoogle, onApple }) {
   return (

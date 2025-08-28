@@ -248,7 +248,7 @@ body {
 
     .auth-right {
         display: block;
-        background: url("../assets/authImage.jpg") center/cover no-repeat;
+        background: url("../assets/images/authImage.jpg") center/cover no-repeat;
         border-top-left-radius: 45px;
         border-bottom-left-radius: 45px
     }
