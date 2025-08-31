@@ -10,6 +10,10 @@ import MessageList from "../components/widgets/MessageList";
 import ThreadInput from "../components/widgets/ThreadInput";
 import Sidebar from "../components/widgets/Sidebar";
 import BottomBar from "../components/widgets/BottomBar";
+import settingIcon from "../assets/images/settings.svg";
+import AccountPopover from "../components/widgets/AccountPopover";
+
+import { logout, subscribeAuth } from "../services/authService";
 
 import { FiSearch } from "react-icons/fi";
 import defaultProfile from "../assets/images/profile.svg";
@@ -19,7 +23,7 @@ import "../css/card.css";
 import "../css/message-item.css";
 import "../css/chat.css";
 
-const threads = [
+const initialThreads = [
     { id: "t2", name: "Raghad Murad", lastMessage: "See you tomorrow!", time: "15:30" },
     { id: "t3", name: "Layan Jarrar", lastMessage: "See you tomorrow!", time: "15:30" },
     { id: "t4", name: "Yaqeen Hamouda", lastMessage: "Awesome!", time: "16:45" },
@@ -36,11 +40,21 @@ const messagesMap = {
     t4: [{ id: "m1", sender: "them", text: "Awesome!", time: "16:45" }],
     t5: [{ id: "m1", sender: "them", text: "Good idea 😄", time: "16:45" }],
 };
+function seedLastAt(timeStr) {
+    if (!timeStr) return 0;
+    const [h, m] = timeStr.split(":").map(Number);
+    const d = new Date();
+    d.setHours(h || 0, m || 0, 0, 0);
+    return d.getTime();
+}
 
 export default function Chat() {
-    const [activeTab, setActiveTab] = useState(() => localStorage.getItem("sbTab") || "messages");
+    const [activeTab, setActiveTab] = useState("messages");
     useEffect(() => { localStorage.setItem("sbTab", activeTab); }, [activeTab]);
 
+    const [threadsState, setThreadsState] = useState(
+        initialThreads.map(t => ({ ...t, lastAt: seedLastAt(t.time) }))
+    );
     const { id } = useParams();
     const hasThread = Boolean(id);
     const navigate = useNavigate();
@@ -48,66 +62,117 @@ export default function Chat() {
     const [query, setQuery] = useState("");
     const [sortBy, setSortBy] = useState("Newest");
 
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [displayName, setDisplayName] = useState("");
+
+
+    useEffect(() => {
+        const unsub = subscribeAuth((u) => {
+            if (!u) { setDisplayName(""); return; }
+            setDisplayName(u.displayName || u.email || "User");
+        });
+        return () => unsub && unsub();
+    }, []);
+
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return threads;
-        return threads.filter(
+        const source = threadsState;
+        if (!q) return source;
+        return source.filter(
             (t) =>
                 t.name.toLowerCase().includes(q) ||
                 t.lastMessage.toLowerCase().includes(q)
         );
-    }, [query]);
+    }, [query, threadsState]);
 
     const sorted = useMemo(() => {
         const items = [...filtered];
         switch (sortBy) {
-            case "Newest": return items.sort((a, b) => b.time.localeCompare(a.time));
-            case "Oldest": return items.sort((a, b) => a.time.localeCompare(b.time));
-            case "A-Z": return items.sort((a, b) => a.name.localeCompare(b.name));
-            case "Z-A": return items.sort((a, b) => b.name.localeCompare(a.name));
-            default: return items;
+            case "Newest":
+                return items.sort((a, b) => (b.lastAt ?? 0) - (a.lastAt ?? 0));
+            case "Oldest":
+                return items.sort((a, b) => (a.lastAt ?? 0) - (b.lastAt ?? 0));
+            case "A-Z":
+                return items.sort((a, b) => a.name.localeCompare(b.name));
+            case "Z-A":
+                return items.sort((a, b) => b.name.localeCompare(a.name));
+            default:
+                return items;
         }
     }, [filtered, sortBy]);
+
 
     const [messages, setMessages] = useState(messagesMap[id] || []);
     const [text, setText] = useState("");
     const bodyRef = useRef(null);
+    const openMenu = () => setMenuOpen(true);
 
+    const onLogout = async () => {
+        try {
+            await logout();
+            navigate("/login", { replace: true });
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     useEffect(() => {
         setMessages(messagesMap[id] || []);
         setText("");
     }, [id]);
-
-
     const send = () => {
         const val = text.trim();
         if (!val) return;
-        setMessages((prev) => [
+
+        // ✅ استخدمي كائن Date باسم مختلف لتجنب أي تظليل
+        const d = new Date();
+        const msgTime = d
+            .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+            .toLowerCase();
+        const lastAt = d.getTime();
+
+        // أضف الرسالة الجديدة (بدون slice)
+        setMessages(prev => [
             ...prev,
-            {
-                id: `m${prev.length + 1}`,
-                sender: "me",
-                text: val,
-                time: new Date().toLocaleTimeString().slice(0, 5),
-            },
+            { id: `m${prev.length + 1}`, sender: 'me', text: val, time: msgTime }
         ]);
-        setText("");
+
+        // حدّث الثريد وحطّه أول القائمة
+        setThreadsState(prev => {
+            const idx = prev.findIndex(t => t.id === id);
+            if (idx === -1) return prev;
+            const updated = { ...prev[idx], lastMessage: val, time: msgTime, lastAt };
+            const arr = prev.slice();
+            arr.splice(idx, 1);   // احذف القديم
+            arr.unshift(updated); // ادفعه للبداية
+            return arr;
+        });
+
+        if (sortBy !== 'Newest') setSortBy('Newest');
+        setText('');
     };
+
 
     const handleBack = () => {
         navigate("/chat");
     };
 
     const avatarSrc = defaultProfile;
-
     return (
         <div className={`chat-desktop ${hasThread ? "has-thread" : "no-thread"}`}>
-            <Sidebar active={activeTab} onChange={setActiveTab} />
+            <Sidebar active={activeTab}
+                onChange={setActiveTab}
+                onOpenSettings={() => setMenuOpen(true)} />
+
 
             <aside className="list-panel">
                 <Card
-                    header={<h1 className="chat-title">Messages</h1>}
+                    header={<div className="chat-head">
+                        <h1 className="chat-title">Messages</h1>
+                        <button className="chat-gear" onClick={openMenu} aria-label="Settings">
+                            <img src={settingIcon} alt="" />
+                        </button>
+                    </div>}
                     className="chat-card"
                     bodyClass="chat-card__body"
                     padded={false}
@@ -156,8 +221,7 @@ export default function Chat() {
                     <div className="thread-wrap">
                         <ThreadHeader
                             avatar={avatarSrc}
-                            name={threads.find((t) => t.id === id)?.name || "Contact"}
-                            status="Online"
+                            name={threadsState.find((t) => t.id === id)?.name || "Contact"}
                             onBack={handleBack}
                         />
                         <MessageList messages={messages} bodyRef={bodyRef} avatarUrl={avatarSrc} />
@@ -172,6 +236,15 @@ export default function Chat() {
             </section>
             <BottomBar active={activeTab} onChange={setActiveTab} />
 
+
+            {menuOpen && (
+                <AccountPopover
+                    open={menuOpen}
+                    onClose={() => setMenuOpen(false)}
+                    displayName={displayName}
+                    onLogout={onLogout}
+                />
+            )}
         </div>
 
     );

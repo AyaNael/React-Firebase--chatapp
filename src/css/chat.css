@@ -3,7 +3,6 @@ body,
 #root {
     height: 100%;
     height: 100svh;
-    overflow: hidden;
     margin: 0;
 }
 
@@ -12,7 +11,6 @@ body,
     font-weight: 100;
 }
 
-/* الغلاف الأساسي: عمود واحد على الموبايل */
 .chat-desktop {
     height: 100%;
     min-height: 0;
@@ -299,6 +297,102 @@ body,
     flex-shrink: 0;
 }
 
+.chat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+      width:100%;
+
+}
+
+.chat-gear {
+    border: 0;
+    background: transparent;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chat-gear:hover {
+    background: #eef5f0;
+}
+
+.chat-gear img {
+    width: 22px;
+    height: 22px;
+    display: block;
+}
+
+.chat-card {
+    overflow: visible;
+}
+
+.chat-card .card-header {
+    position: relative;
+}
+
+.chat-popover-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .15);
+    z-index: 1000;
+}
+
+.chat-popover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+    z-index: 1001;
+
+    width: clamp(240px, 90vw, 360px);
+    max-height: min(85vh, 520px);
+    overflow: auto;
+}
+
+.pop-avatar {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.pop-avatar img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.pop-name {
+    text-align: center;
+    font-weight: 700;
+}
+
+.pop-logout {
+    border: 0;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 @font-face {
     font-family: 'SF Pro Text Bold';
     src: url('../assets/fonts/SFPRODISPLAYBOLD.OTF') format('truetype');
@@ -340,7 +434,7 @@ body,
         display: flex !important;
     }
 
-  
+
 }
 
 /* ===== Tablet — 768–1023px ===== */
@@ -349,7 +443,9 @@ body,
         grid-template-columns: 72px 320px 1fr;
     }
 
-    /* Sidebar | List | Thread */
+    .chat-gear {
+        display: none;
+    }
 
     .sidebar {
         display: flex !important;
@@ -378,7 +474,6 @@ body,
     }
 
 
-
     .list-panel,
     .thread-panel,
     .thread-wrap {
@@ -392,6 +487,11 @@ body,
     .chat-desktop {
         grid-template-columns: 72px 340px 1fr;
     }
+
+    .chat-gear {
+        display: none;
+    }
+
 
     .sidebar {
         display: flex !important;

@@ -1,7 +1,10 @@
-import defaultProfile from "../../assets/images/profile.svg";
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as MastercardLine } from "../../assets/images/mastercard-line.svg";
+import useAvatar, { fileToDataURL } from "../../hooks/useAvatar";
+
+import { logout } from "../../services/authService";
+import { setRememberMe } from "../../utils/cookies";
 
 import chatIcon from "../../assets/images/chat-icon.svg";
 import worldIcon from "../../assets/images/world-icon.svg";
@@ -11,7 +14,16 @@ import videoIcon from "../../assets/images/camera-video-icon.svg";
 import logoutIcon from "../../assets/images/logout.svg";
 import settingIcon from "../../assets/images/settings.svg";
 
-export default function Sidebar({ active = "messages", onChange }) {
+export default function Sidebar({ active = "messages", onChange , onOpenSettings }) {
+    const handleLogout = async () => {
+        try {
+            setRememberMe(false);
+            await logout();
+            navigate("/login", { replace: true });
+        } catch (e) {
+            console.error("Logout failed:", e);
+        }
+    };
     const mainItems = [
         { key: "world", icon: worldIcon, label: "Explore" },
         { key: "messages", icon: chatIcon, label: "Messages" },
@@ -21,26 +33,23 @@ export default function Sidebar({ active = "messages", onChange }) {
     ];
 
     const navigate = useNavigate();
+    const { avatar, setAvatar } = useAvatar();
 
     const bottomItems = [
-        { key: "settings", icon: settingIcon, label: "Settings" },
-        { key: "logout", icon: logoutIcon, label: "Logout", onClick: () => navigate("/signup"), noActive: true },
+        { key: "settings", icon: settingIcon, label: "Settings", onClick: onOpenSettings, noActive: true},
+        { key: "logout", icon: logoutIcon, label: "Logout", onClick: handleLogout, noActive: true },
     ];
 
-    const [avatar, setAvatar] = useState(defaultProfile);
     const inputRef = useRef(null);
-    const prevUrlRef = useRef(null);
-
+ 
     const handlePick = () => inputRef.current?.click();
-    const handleFile = (e) => {
+    const handleFile = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-        const url = URL.createObjectURL(file);
-        prevUrlRef.current = url;
-        setAvatar(url);
+        const dataUrl = await fileToDataURL(file);
+        setAvatar(dataUrl);         
+        e.target.value = "";
     };
-    useEffect(() => () => prevUrlRef.current && URL.revokeObjectURL(prevUrlRef.current), []);
 
     const renderItem = ({ key, icon, label, onClick, noActive }) => {
         const isActive = !noActive && active === key;

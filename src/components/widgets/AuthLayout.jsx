@@ -1,6 +1,6 @@
 import "../../css/auth.css";
 import Divider from "../ui/Divider";
-import SocialAuthButtons from "../widgets/SocialAuthButtons";
+import SocialAuthButtons from "./SocialAuthButtons";
 
 function AuthLayout({ children, swap }) {
     return (

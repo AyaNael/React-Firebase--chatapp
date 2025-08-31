@@ -8,6 +8,7 @@ import { setRememberMe, getRememberMe } from "../utils/cookies";
 import { signInEmail, subscribeAuth, logout } from "../services/authService";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { applyAuthPersistence } from "../services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -37,8 +38,9 @@ export default function Login() {
 
     try {
       setRememberMe(values.remember);
+      await applyAuthPersistence(values.remember);          
       await signInEmail(values.email.trim(), values.password);
-      navigate("/chat");
+      navigate("/chat", { replace: true });
     } catch (err) {
       setFormError(mapAuthError(err));
     } finally {
@@ -89,7 +91,7 @@ export default function Login() {
           {submitting ? "Logging in..." : "Login"}
         </button>
 
-      
+
       </form>
     </AuthLayout>
   );

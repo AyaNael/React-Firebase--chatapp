@@ -1,5 +1,5 @@
 // components/thread/MessageList.jsx
-import MessageBubble from "../widgets/MessageBubble";
+import MessageBubble from "./MessageBubble";
 
 export default function MessageList({ messages, bodyRef, avatarUrl }) {
     return (
