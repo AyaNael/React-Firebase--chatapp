@@ -1,36 +1,36 @@
 html,
 body,
 #root {
-height: 100svh;  
+    height: 100svh;
 }
 
 .thread-wrap {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
     background: #fff;
-    min-height: 0;
-  flex: 1 1 auto;
 
 }
 
 .thread-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    background: #FAFAFA;
-    padding: 12px;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    gap: 0;
-    overscroll-behavior: contain;
+    background: #FAFAFA;
+    padding: 12px;
+
 }
 
 .thread-header {
-    position: sticky;
+    position: static !important;
     top: 0;
-    z-index: 5;
+    z-index: 1;
     background: #fff;
     box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
     display: grid;
@@ -39,7 +39,7 @@ height: 100svh;
     gap: 8px;
     padding: 10px 12px;
     border-bottom: 1px solid #eee;
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
 }
 
 .back-btn {
