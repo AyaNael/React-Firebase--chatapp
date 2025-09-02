@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import useAvatar, { fileToDataURL } from "../../hooks/useAvatar";
+import useAvatar from "../../hooks/useAvatar";
+import { uploadUserAvatar } from "../../services/storageService";
 
 export default function AccountPopover({ open, onClose, displayName, onLogout }) {
     const { avatar, setAvatar } = useAvatar();
@@ -10,9 +11,9 @@ export default function AccountPopover({ open, onClose, displayName, onLogout })
     const onFile = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const dataUrl = await fileToDataURL(file);
-        setAvatar(dataUrl);    
-        e.target.value = "";   
+        const dataUrl = await uploadUserAvatar(file);
+        setAvatar(`${dataUrl}#v=${Date.now()}`); // كسر الكاش بخانة وهمية
+        window.dispatchEvent(new CustomEvent("avatar:changed", { detail: `${dataUrl}#v=${Date.now()}` }));
         onClose?.();
     };
 

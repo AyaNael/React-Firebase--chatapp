@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as MastercardLine } from "../../assets/images/mastercard-line.svg";
-import useAvatar, { fileToDataURL } from "../../hooks/useAvatar";
 
 import { logout } from "../../services/authService";
 import { setRememberMe } from "../../utils/cookies";
-
+import useAvatar from "../../hooks/useAvatar";
+import { uploadAvatarToFirestore } from "../../services/profileService";
 import chatIcon from "../../assets/images/chat-icon.svg";
 import worldIcon from "../../assets/images/world-icon.svg";
 import scheduleIcon from "../../assets/images/schedule-icon.svg";
@@ -14,7 +14,7 @@ import videoIcon from "../../assets/images/camera-video-icon.svg";
 import logoutIcon from "../../assets/images/logout.svg";
 import settingIcon from "../../assets/images/settings.svg";
 
-export default function Sidebar({ active = "messages", onChange , onOpenSettings }) {
+export default function Sidebar({ active = "messages", onChange, onOpenSettings }) {
     const handleLogout = async () => {
         try {
             setRememberMe(false);
@@ -36,18 +36,19 @@ export default function Sidebar({ active = "messages", onChange , onOpenSettings
     const { avatar, setAvatar } = useAvatar();
 
     const bottomItems = [
-        { key: "settings", icon: settingIcon, label: "Settings", onClick: onOpenSettings, noActive: true},
+        { key: "settings", icon: settingIcon, label: "Settings", onClick: onOpenSettings, noActive: true },
         { key: "logout", icon: logoutIcon, label: "Logout", onClick: handleLogout, noActive: true },
     ];
 
     const inputRef = useRef(null);
- 
+
     const handlePick = () => inputRef.current?.click();
     const handleFile = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const dataUrl = await fileToDataURL(file);
-        setAvatar(dataUrl);         
+        const dataUrl = await uploadAvatarToFirestore(file);
+        setAvatar(`${dataUrl}#v=${Date.now()}`); // كسر الكاش بخانة وهمية
+        window.dispatchEvent(new CustomEvent("avatar:changed", { detail: `${dataUrl}#v=${Date.now()}` }));
         e.target.value = "";
     };
 

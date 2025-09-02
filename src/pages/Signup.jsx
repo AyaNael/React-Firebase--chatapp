@@ -7,6 +7,9 @@ import { mapAuthError } from "../utils/firebaseErrors";
 import { signUpEmail } from "../services/authService";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../config/firebase";
+import { updateProfile } from "firebase/auth";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -26,7 +29,21 @@ export default function Signup() {
     if (hasErrors) { setSubmitting(false); return; }
 
     try {
-      await signUpEmail(values.email.trim(), values.password);
+      const cred = await signUpEmail(values.email.trim(), values.password);
+      const user = cred.user;
+
+      const displayName = values.name.trim() || "User";
+      await updateProfile(user, { displayName });
+
+
+      await setDoc(doc(db, "users", user.uid), {
+        displayName,
+        email: user.email || "",
+        photoURL: user.photoURL || "",
+        isOnline: true,
+        createdAt: serverTimestamp(),
+        lastSeen: serverTimestamp(),
+      }, { merge: true });
       navigate("/login");
     } catch (err) {
       setFormError(mapAuthError(err));
@@ -86,7 +103,7 @@ export default function Signup() {
           {submitting ? "Signing up..." : "Signup"}
         </button>
 
-  
+
       </form>
     </AuthLayout>
   );
